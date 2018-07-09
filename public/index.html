@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Survey Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compressed CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/css/foundation.min.css" integrity="sha256-GSio8qamaXapM8Fq9JYdGNTvk/dgs+cMLgPeevOYEx0= sha384-wAweiGTn38CY2DSwAaEffed6iMeflc0FMiuptanbN4J+ib+342gKGpvYRWubPd/+ sha512-QHEb6jOC8SaGTmYmGU19u2FhIfeG+t/hSacIWPpDzOp5yygnthL3JwnilM7LM1dOAbJv62R+/FICfsrKUqv4Gg==" crossorigin="anonymous">
+    <!-- Compressed JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/foundation-sites@6.4.3/dist/js/foundation.min.js" integrity="sha256-mRYlCu5EG+ouD07WxLF8v4ZAZYCA6WrmdIXyn1Bv9Vk= sha384-KzKofw4qqetd3kvuQ5AdapWPqV1ZI+CnfyfEwZQgPk8poOLWaabfgJOfmW7uI+AV sha512-0gHfaMkY+Do568TgjJC2iMAV0dQlY4NqbeZ4pr9lVUTXQzKu8qceyd6wg/3Uql9qA2+3X5NHv3IMb05wb387rA==" crossorigin="anonymous"></script>
+</head>
+<style>
+    body{
+        background-image: url(ninja.jpeg)
+    }
+    label, h3{
+        color: wheat;
+    }
+
+</style>
+<body>
+    <div class="center container translucent-form-overlay" style="padding:30px;">
+        <div class="row center">
+            <div style="width: 600px;"class="center">
+                <div id="message" class="z-depth-3" style=" width: 650px;background-color:steelblue; color:springgreen;"></div>
+                <h3><strong>Survey Form</strong></h3>
+                <form id="form" >
+                    <div class="row columns">
+                        <label>Your Name<input id="name" type="text" name="name" placeholder="Name"></label>
+                    </div>
+                    <div class="row columns">
+                        <label>Dojo Location
+                            <select id="location" name="location" type="text">
+                                <option value="Burbank">Burbank</option>
+                                <option value="Silicon Valley">Silicon Valley</option>
+                                <option value="Seattle">Seattle</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row columns">
+                        <label>Favorite Language
+                            <select id="languages" name='language' type="text">
+                                <option value="Python">Python</option>
+                                <option value="JavaScript">JavaScript</option>
+                                <option value="C#">C#</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row columns">
+                        <label>Comment
+                            <textarea id="comment" type="textarea" name="comment" placeholder="Tell us about your experience becoming a ninja at the dojo"></textarea>
+                        </label>
+                    </div>
+                        <input id="submit" type="submit" class="wave-effect primary button search-button" value="SUBMIT">
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            //working
+            console.log("WHAZZZZZAAAAAAAAP????")
+            //as the script runs on the browser it connect to our server via sockets
+            //instantiated socket
+            //Make connection
+            var socket=io.connect();
+            //QUERY DOM 
+            //name, location, language, comment
+            var name= document.getElementById('name');
+            var location=document.getElementById('location');
+            var language=document.getElementById('language');
+            var comment=document.getElementById('comment');
+            var message = document.getElementById('message');
+            var btn=document.getElementById('submit')
+            //working
+            console.log(btn)
+            function random(max){
+                return Math.floor(Math.random() * Math.floor(max));
+            }
+            var x = random(1000)
+
+            var obj= {
+                name: name.value,
+                location: location.value,
+                language: languages.value,
+                comment: comment.value,
+                number: x,
+            }
+            var json = JSON.stringify(obj);
+            //EMIT event
+            //1
+            btn.addEventListener('click', function(event){
+                event.preventDefault();
+                //emit a message to the server
+                console.log("YO!")
+                socket.emit('posting_form', json)
+                console.log(msg)
+            })
+            //console.log("CAN YOU SEE ME????")
+            //LISTEN for update event
+            //3
+            socket.on('update', function(form_data){
+                console.log("WE IN HERE", form_data);
+                message.innerHTML +=  "<p><strong>You emited the following information to the server " + json + "</strong></p><p>" + "Your lucky number emitted by the server is " + obj.number + "</p>";
+                console.log(json)
+
+            });
+
+        })
+    </script>
+</body>
+</html>
